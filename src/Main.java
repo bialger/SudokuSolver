@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
 
 public class Main {
 
@@ -46,13 +45,20 @@ public class Main {
 
     class ListenerReset implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Нажатие кнопки! От - "+
-                    e.getActionCommand() + "\n");
+            for (int i = 0; i < numberFields.length; i++) {
+                numberFields[i].setText("");
+                arr[i / 9][i % 9] = 0;
+            }
         }
     }
 
     class ListenerSolve implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            for (int i = 0; i < numberFields.length; i++) {
+                String str = numberFields[i].getText();
+                if (!str.equals("")) arr[i / 9][i % 9] = Integer.parseInt(numberFields[i].getText());
+                else arr[i / 9][i % 9] = 0;
+            }
             print_initial(arr, arr.length);
             if (sudoku(arr)) {
                 System.out.println("AFTER SOLVING : ");
@@ -61,31 +67,53 @@ public class Main {
                     numberFields[i].setText(String.valueOf(arr[i / 9][i % 9]));
                 }
 
+                PopUp okMessage = new PopUp("Solved!");
+                okMessage.show();
                 print(arr, arr.length);
             }
-            else System.out.println("UNSOLVABLE");
+            else {
+                System.out.println("UNSOLVABLE");
+                PopUp badMessage = new PopUp("This sudoku can`t be solved!");
+                badMessage.show();
+            }
+        }
+    }
+
+    record PopUp(String text) {
+        public void show() {
+            JFrame jFrame = new JFrame();
+            JOptionPane.showMessageDialog(jFrame, text);
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater( new Runnable (){public void run (){
-            new Main();
-        }});
+        SwingUtilities.invokeLater(Main::new);
     }
 
     public static boolean sudoku(int[][] grid) {
-        int[] ra = Unassigned(grid);
-        if (ra[0] == -1) return true;
+        boolean proceed = false;
 
-        int row = ra[0];
-        int col = ra[1];
+        for (int i = 0; i < grid.length; i++) {
+            if (grid[i / 9][i % 9] != 0) {
+                proceed = true;
+                break;
+            }
+        }
 
-        for (int num = 1; num <= 9; num++) {
-            if (isSafe(grid, row, col, num)) {
-                grid[row][col] = num;
-                boolean check = sudoku(grid);
-                if (check) return true;
-                grid[row][col] = 0;
+        if (proceed){
+            int[] ra = Unassigned(grid);
+            if (ra[0] == -1) return true;
+
+            int row = ra[0];
+            int col = ra[1];
+
+            for (int num = 1; num <= 9; num++) {
+                if (isSafe(grid, row, col, num)) {
+                    grid[row][col] = num;
+                    boolean check = sudoku(grid);
+                    if (check) return true;
+                    grid[row][col] = 0;
+                }
             }
         }
 
