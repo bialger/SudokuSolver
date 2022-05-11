@@ -1,21 +1,76 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+
 public class Main {
 
-    public static void main(String[] args) {
-        int[][] arr = {{5, 8, 0, 2, 0, 0, 4, 7, 0},
-                {0, 2, 0, 0, 0, 0, 0, 3, 0},
-                {0, 3, 0, 0, 5, 4, 0, 0, 0},
-                {0, 0, 0, 5, 6, 0, 0, 0, 0},
-                {0, 0, 7, 0, 3, 0, 9, 0, 0},
-                {0, 0, 0, 0, 9, 1, 0, 0, 0},
-                {0, 0, 0, 8, 2, 0, 0, 6, 0},
-                {0, 7, 0, 0, 0, 0, 0, 8, 0},
-                {0, 9, 4, 0, 0, 6, 0, 1, 5}};
-        print_initial(arr, arr.length);
-        if (sudoku(arr)) {
-            System.out.println("AFTER SOLVING : ");
-            print(arr, arr.length);
+    int[][] arr = {{5, 8, 0, 2, 0, 0, 4, 7, 0},
+            {0, 2, 0, 0, 0, 0, 0, 3, 0},
+            {0, 3, 0, 0, 5, 4, 0, 0, 0},
+            {0, 0, 0, 5, 6, 0, 0, 0, 0},
+            {0, 0, 7, 0, 3, 0, 9, 0, 0},
+            {0, 0, 0, 0, 9, 1, 0, 0, 0},
+            {0, 0, 0, 8, 2, 0, 0, 6, 0},
+            {0, 7, 0, 0, 0, 0, 0, 8, 0},
+            {0, 9, 4, 0, 0, 6, 0, 1, 5}};
+
+    JTextField[] numberFields = new JTextField[81];
+
+    Main () {
+        JFrame sudokuFrame = new JFrame ("Sudoku Solver");
+        sudokuFrame.setLayout (new GridLayout (10,9));
+        sudokuFrame.setSize (900, 1000);
+        sudokuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JButton buttonSolve = new JButton("Solve");
+        JButton buttonReset = new JButton("Reset");
+        buttonReset.addActionListener(new ListenerReset());
+        buttonSolve.addActionListener(new ListenerSolve());
+        JLabel[] empty = new JLabel[7];
+
+        for (int i = 0; i < numberFields.length; i++) {
+            numberFields[i] = new JTextField (1);
+            sudokuFrame.add(numberFields[i]);
         }
-        else System.out.println("UNSOLVABLE");
+
+        sudokuFrame.add(buttonReset);
+
+        for (int i = 0; i < empty.length; i++) {
+            empty[i] = new JLabel ("");
+            sudokuFrame.add(empty[i]);
+        }
+
+        sudokuFrame.add(buttonSolve);
+        sudokuFrame.setVisible(true);
+    }
+
+    class ListenerReset implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Нажатие кнопки! От - "+
+                    e.getActionCommand() + "\n");
+        }
+    }
+
+    class ListenerSolve implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            print_initial(arr, arr.length);
+            if (sudoku(arr)) {
+                System.out.println("AFTER SOLVING : ");
+
+                for (int i = 0; i < numberFields.length; i++) {
+                    numberFields[i].setText(String.valueOf(arr[i / 9][i % 9]));
+                }
+
+                print(arr, arr.length);
+            }
+            else System.out.println("UNSOLVABLE");
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater( new Runnable (){public void run (){
+            new Main();
+        }});
     }
 
     public static boolean sudoku(int[][] grid) {
