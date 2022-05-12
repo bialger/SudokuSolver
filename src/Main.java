@@ -4,15 +4,7 @@ import javax.swing.*;
 
 public class Main {
 
-    int[][] arr = {{5, 8, 0, 2, 0, 0, 4, 7, 0},
-            {0, 2, 0, 0, 0, 0, 0, 3, 0},
-            {0, 3, 0, 0, 5, 4, 0, 0, 0},
-            {0, 0, 0, 5, 6, 0, 0, 0, 0},
-            {0, 0, 7, 0, 3, 0, 9, 0, 0},
-            {0, 0, 0, 0, 9, 1, 0, 0, 0},
-            {0, 0, 0, 8, 2, 0, 0, 6, 0},
-            {0, 7, 0, 0, 0, 0, 0, 8, 0},
-            {0, 9, 4, 0, 0, 6, 0, 1, 5}};
+    int[][] arr = new int[9][9];
 
     JTextField[] numberFields = new JTextField[81];
 
@@ -21,14 +13,27 @@ public class Main {
         sudokuFrame.setLayout (new GridLayout (10,9));
         sudokuFrame.setSize (900, 1000);
         sudokuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        sudokuFrame.setResizable(false);
         JButton buttonSolve = new JButton("Solve");
         JButton buttonReset = new JButton("Reset");
         buttonReset.addActionListener(new ListenerReset());
         buttonSolve.addActionListener(new ListenerSolve());
+        buttonReset.setFont(new Font("Serif", Font.PLAIN ,28));
+        buttonSolve.setFont(new Font("Serif", Font.PLAIN ,28));
         JLabel[] empty = new JLabel[7];
 
         for (int i = 0; i < numberFields.length; i++) {
             numberFields[i] = new JTextField (1);
+            int bottomBorder = (i / 9 == 2 || i / 9 == 5) ? 2 : 0;
+            int rightBorder = (i % 9 == 2 || i % 9 == 5) ? 2 : 0;
+            bottomBorder = (i / 9 == 8) ? 1 : bottomBorder;
+            rightBorder = (i % 9 == 8) ? 1 : rightBorder;
+            numberFields[i].setBorder(BorderFactory.createMatteBorder(1, 1,
+                    bottomBorder, rightBorder, Color.BLACK));
+            numberFields[i].setFont(new Font("Serif", Font.PLAIN ,48));
+            numberFields[i].setHorizontalAlignment(JTextField.CENTER);
+            if ((i % 9 < 3 || i % 9 > 5) && (i / 9 < 3 || i / 9 > 5) || (i % 9 > 2 && i % 9 < 6) && (i / 9 > 2 &&
+                    i / 9 < 6)) numberFields[i].setBackground(new java.awt.Color(130, 170, 200));
             sudokuFrame.add(numberFields[i]);
         }
 
@@ -54,27 +59,33 @@ public class Main {
 
     class ListenerSolve implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+
             for (int i = 0; i < numberFields.length; i++) {
                 String str = numberFields[i].getText();
-                if (!str.equals("")) arr[i / 9][i % 9] = Integer.parseInt(numberFields[i].getText());
-                else arr[i / 9][i % 9] = 0;
+                if (!str.equals("")) {
+                    if (str.charAt(0) >= '0' && str.charAt(0) <= '9' && str.length() == 1)
+                        arr[i / 9][i % 9] = Integer.parseInt(numberFields[i].getText());
+                    else {
+                        arr[i / 9][i % 9] = 0;
+                        numberFields[i].setText("");
+                    }
+                }
             }
+
             print_initial(arr, arr.length);
             if (sudoku(arr)) {
-                System.out.println("AFTER SOLVING : ");
 
                 for (int i = 0; i < numberFields.length; i++) {
                     numberFields[i].setText(String.valueOf(arr[i / 9][i % 9]));
                 }
 
-                PopUp okMessage = new PopUp("Solved!");
-                okMessage.show();
+                System.out.println("AFTER SOLVING : ");
                 print(arr, arr.length);
+                new PopUp("Solved!").show();
             }
             else {
                 System.out.println("UNSOLVABLE");
-                PopUp badMessage = new PopUp("This sudoku can`t be solved!");
-                badMessage.show();
+                new PopUp("This sudoku can`t be solved!").show();
             }
         }
     }
