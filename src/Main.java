@@ -72,21 +72,15 @@ public class Main {
                 }
             }
 
-            print_initial(arr, arr.length);
             if (sudoku(arr)) {
 
                 for (int i = 0; i < numberFields.length; i++) {
                     numberFields[i].setText(String.valueOf(arr[i / 9][i % 9]));
                 }
 
-                System.out.println("AFTER SOLVING : ");
-                print(arr, arr.length);
                 new PopUp("Solved!").show();
             }
-            else {
-                System.out.println("UNSOLVABLE");
-                new PopUp("This sudoku can`t be solved!").show();
-            }
+            else new PopUp("This sudoku can`t be solved!").show();
         }
     }
 
@@ -180,34 +174,5 @@ public class Main {
     public static boolean isSafe(int[][] grid, int row, int col, int num) {
         return (!usedInCol(grid, col, num) && !usedInRow(grid, row, num) && !usedInBox(grid, row - row % 3,
                 col - col % 3, num));
-    }
-
-    public static void print(int[][] arr, int n) {
-
-        for (int i = 0; i < n; i++) {
-            if (i % 3 == 0 && i != 0) System.out.println("----------|---------|----------");
-
-            for (int j = 0; j < n; j++) {
-                if (j % 3 == 0) System.out.print("|");
-                System.out.print(" " + arr[i][j] + " ");
-            }
-
-            System.out.println();
-        }
-    }
-
-    public static void print_initial(int[][] arr, int n) {
-
-        for (int i = 0; i < n; i++) {
-            if (i % 3 == 0 && i != 0) System.out.println("----------|---------|----------");
-
-            for (int j = 0; j < n; j++) {
-                if (j % 3 == 0) System.out.print("|");
-                if (arr[i][j] == 0) System.out.print(" " + "-" + " ");
-                else System.out.print(" " + arr[i][j] + " ");
-            }
-
-            System.out.println();
-        }
     }
 }
